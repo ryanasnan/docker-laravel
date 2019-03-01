@@ -1,0 +1,92 @@
+1. create folder Projects for repository app
+   add some repository
+   exp : laravel 5.5
+   mkdir laravel5.5
+   cd laravel5.5
+   git clone --single-branch --branch 5.5 https://github.com/laravel/laravel.git .
+
+2. create folder docker-collection to put the docker service
+   add some docker service
+   exp : docker-laravel
+   mkdir docker-laravel
+   cd  docker-laravel
+
+3. create docker-compose.yml (file attached)
+
+4. create nginx configuration
+   exp : for localhost ./nginx/conf.d/localhost.conf
+   server {
+       listen 80;
+       server_name localhost;
+       access_log /var/log/nginx/localhost.access.log;
+       error_log /var/log/nginx/localhost.error.log;
+       root /var/www;
+       index index.php index.html index.htm;
+       location / {
+             try_files $uri $uri/ /index.php?$query_string;
+       }
+       location ~ \.php$ {
+           # fastcgi_pass unix:/var/run/php-fpm/php-fpm.sock;
+           fastcgi_pass app:9000;
+           fastcgi_index index.php;
+           fastcgi_read_timeout 1h;
+           fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+           include fastcgi_params;
+           fastcgi_ignore_client_abort on;
+       }
+   }
+
+   exp : for laravel .nginx/conf.d/laravel.conf
+
+   server {
+       listen 80;
+       server_name laravel55.com;
+       access_log /var/log/nginx/laravel55.access.log;
+       error_log /var/log/nginx/laravel55.error.log;
+       root /var/www/laravel5.5/public;
+       index index.php index.html index.htm;
+       location / {
+             try_files $uri $uri/ /index.php?$query_string;
+       }
+       location ~ \.php$ {
+           # fastcgi_pass unix:/var/run/php-fpm/php-fpm.sock;
+           fastcgi_pass app:9000;
+           fastcgi_index index.php;
+           fastcgi_read_timeout 1h;
+           fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+           include fastcgi_params;
+           fastcgi_ignore_client_abort on;
+       }
+   }
+
+
+5. add host 
+
+   sudo nano /etc/hosts
+
+   127.0.0.1       laravel55.com
+
+6. install composer packge (in repository) and add .env file
+
+   docker exec -it app-php-fpm /bin/bash
+   cd laravel5.5
+   composer install
+
+   add file .env and modify APP_KEY and database
+
+   cp .env.example .env
+
+   php artisan key:generate
+
+7. access laravel55.com in browser
+
+optional configuration for database
+
+   DB_CONNECTION=mysql
+   DB_HOST=database
+   DB_PORT=3306
+   DB_DATABASE=laravel
+   DB_USERNAME=root
+   DB_PASSWORD=root
+
+finally, add permission mode 777 to "storage" directory

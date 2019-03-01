@@ -1,0 +1,44 @@
+version: '3.6'
+services:
+  app:
+    container_name: app-php-fpm
+    image: callmeblagga/centos7:fpm-1.0
+    networks:
+      - docker-network
+    working_dir: /var/www
+    volumes:
+      - ~/Projects:/var/www
+    ports:
+      - 9000:9000
+    restart:
+      always
+  webserver:
+    container_name: nginx
+    image: nginx:latest
+    networks:
+      - docker-network
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ~/Projects:/var/www
+    ports:
+      - 80:80
+    restart:
+      always
+  database:
+    container_name: mysql
+    image: mysql:5.7.22
+    environment:
+      - MYSQL_DATABASE=laravel
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+      - TZ=UTC
+    ports:
+      - "3306:3306"
+    networks:
+      - docker-network
+    restart:
+      always
+networks:
+  docker-network: 
+    driver: bridge
