@@ -1,3 +1,9 @@
+requirement
+docker
+docker-compose
+user with group sudo (and docker if docker had been installed)
+
+
 1. create folder Projects for repository app
    add some repository
    exp : laravel 5.5
@@ -59,6 +65,7 @@
        }
    }
 
+run docker-compose up -d
 
 5. add host 
 
@@ -72,15 +79,26 @@
    cd laravel5.5
    composer install
 
-   add file .env and modify APP_KEY and database
+   if happen the memory lack just exit the docker container bash and create swap
 
+   sudo fallocate -l 1G /swapfile
+   sudo mkswap /swapfile
+   sudo swapon /swapfile
+
+   add file .env and modify APP_KEY and database
    cp .env.example .env
 
    php artisan key:generate
 
+   lastly make owner for apache
+   cd /var/www
+   chown -R apache:apache laravel5.5
+
+   note: still not understood why laravel log (literally storage directory) just can access by that user
+
 7. access laravel55.com in browser
 
-optional configuration for database
+configuration for database
 
    DB_CONNECTION=mysql
    DB_HOST=database
@@ -89,4 +107,5 @@ optional configuration for database
    DB_USERNAME=root
    DB_PASSWORD=root
 
-finally, add permission mode 777 to "storage" directory
+please see the list of docker network IP to get actual IP address in each container
+or just use the container service name to make connection
